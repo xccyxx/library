@@ -5,14 +5,10 @@ function Book(title, author, pages, isRead) {
     this.author = author;
     this.pages = pages;
     this.isRead = isRead;
-    this.info = function() {
-        if (read === true) {
-            return `${title} by ${author}, ${author} pages, read.`
-        }
-        else {
-            return `${title} by ${author}, ${author} pages, not read yet.`
-        }
-    }
+}
+
+Book.prototype.toggleReadStatus = function() {
+    this.isRead = !this.isRead;
 }
 
 function addBookToLibrary(title, author, pages, isRead) {
@@ -20,33 +16,70 @@ function addBookToLibrary(title, author, pages, isRead) {
     myLibrary.push(newbook);
 }
 
+function removeBookFromLibrary(card) {
+    myLibrary.splice(card.dataset.index, 1);
+}
+
 const displayBooks = (library) => {
     const cardContainer = document.querySelector(".card-container");
     cardContainer.replaceChildren()
     library.forEach(book => {
         const card = document.createElement("div");
+        card.dataset.index = library.indexOf(book);
         // Add styling Class
-        card.classList.add("card")
+        card.classList.add("card");
         // Set up info in the card
         const title = document.createElement("h3");
-        title.innerText = book.title;
+        title.textContent = book.title;
         const author = document.createElement("p");
-        author.innerText = `written by ${book.author}`;
+        author.textContent = `written by ${book.author}`;
         const pages = document.createElement("p");
-        pages.innerText = `${book.pages} pages`;
+        pages.textContent = `${book.pages} pages`;
         const isRead = document.createElement("p");
         if (book.isRead) {
-            isRead.innerText = "Read";
+            isRead.textContent = "Read ✔";
         } else {
-            isRead.innerText = "Not read";
+            isRead.textContent = "Not read ✘";
         }
+        //Set up button div
+        const btnContainer = document.createElement("div");
+        btnContainer.classList.add("btn-container");
+        // Set up read button
+        const toggleReadBtn = document.createElement("button");
+        toggleReadBtn.classList.add("toggle-read-btn");
+        
+        if (book.isRead) {
+            toggleReadBtn.textContent = "Unread";
+            toggleReadBtn.classList.add("unread");
+        } else {
+            toggleReadBtn.textContent = "Read";
+            toggleReadBtn.classList.add("read");
+        }
+        
+        toggleReadBtn.addEventListener("click", () => {
+            book.toggleReadStatus();
+            displayBooks(library);
+        })
+        // Set up remove button
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "Remove";
+        removeBtn.classList.add("remove-btn");
+        removeBtn.addEventListener("click", () => {
+            removeBookFromLibrary(card);
+            displayBooks(library);
+        })
+
+        // Append buttons to btn container
+        btnContainer.append(toggleReadBtn);
+        btnContainer.append(removeBtn);
 
         // Append info
         card.append(title);
         card.append(author);
         card.append(pages);
         card.append(isRead);
-
+        card.append(btnContainer);
+        
         // Insert card
         cardContainer.append(card);
     })
@@ -83,7 +116,6 @@ const closeDialogBtn = document.querySelector(".close-dialog-btn");
 closeDialogBtn.addEventListener("click", () => {
     dialog.close();
 })
-
 
 addBookToLibrary("Elon Musk", "Walter Isaacson", 688, true);
 addBookToLibrary("Outliers: The Story of Success", "Malcolm Gladwell", 336, false);
