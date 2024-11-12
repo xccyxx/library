@@ -22,6 +22,7 @@ function addBookToLibrary(title, author, pages, isRead) {
 
 const displayBooks = (library) => {
     const cardContainer = document.querySelector(".card-container");
+    cardContainer.replaceChildren()
     library.forEach(book => {
         const card = document.createElement("div");
         // Add styling Class
@@ -30,9 +31,9 @@ const displayBooks = (library) => {
         const title = document.createElement("h3");
         title.innerText = book.title;
         const author = document.createElement("p");
-        author.innerText = `Author: ${book.author}`;
+        author.innerText = `written by ${book.author}`;
         const pages = document.createElement("p");
-        pages.innerText = `Pages: ${book.pages}`;
+        pages.innerText = `${book.pages} pages`;
         const isRead = document.createElement("p");
         if (book.isRead) {
             isRead.innerText = "Read";
@@ -52,13 +53,38 @@ const displayBooks = (library) => {
 }
 
 // Add new book button
+const dialog = document.querySelector(".add-book-dialog");
+
 const addBookBtn = document.querySelector(".add-book-btn");
 addBookBtn.addEventListener("click", () => {
-    const dialog = document.querySelector(".add-book-dialog")
     dialog.showModal();
 })
 
+// Prevent the behaviour of the submission
+const form = document.querySelector(".form-section");
+form.addEventListener("submit", (event) => {
+    // Prevent the form to be submitted to backend
+    event.preventDefault();
 
-addBookToLibrary("test1", "author1", 300, true);
-addBookToLibrary("test2", "author2", 300, false);
+    // Extract the form data
+    title = document.querySelector(".form-section").elements["title"].value
+    author = document.querySelector(".form-section").elements["author"].value
+    pages = document.querySelector(".form-section").elements["pages"].value
+    isRead = document.querySelector(".form-section").elements["isRead"].checked
+
+    // Add the new book to the arrar and display it
+    addBookToLibrary(title, author, pages, isRead);
+    displayBooks(myLibrary);
+    form.reset();
+    dialog.close();
+})
+// Close dialog button
+const closeDialogBtn = document.querySelector(".close-dialog-btn");
+closeDialogBtn.addEventListener("click", () => {
+    dialog.close();
+})
+
+
+addBookToLibrary("Elon Musk", "Walter Isaacson", 688, true);
+addBookToLibrary("Outliers: The Story of Success", "Malcolm Gladwell", 336, false);
 displayBooks(myLibrary);
