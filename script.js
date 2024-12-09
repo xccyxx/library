@@ -1,93 +1,133 @@
-const myLibrary = [];
+class Library {
+    #library = [];
+
+    addBook = (book) => {
+        this.#library.push(book);
+    }
+
+    removeBook = (book) => {
+        // this.#library.splice(indexOf(book), 1);
+        console.log(book);
+    }
+
+    listBooks = () => [...this.#library];
+}
+
+const myLibrary = new Library();
 
 class Book {
+    #title;
+    #author;
+    #pages;
+    isRead;
     constructor(title, author, pages, isRead) {
-        this.title = title;
-        this.author = author;
-        this.pages = pages;
+        this.#title = title;
+        this.#author = author;
+        this.#pages = pages;
         this.isRead = isRead;
     }
 
     toggleReadStatus() {
         this.isRead = !this.isRead;
     }
+}
 
-    addBookToLibrary() {
-
+class Card {
+    #title;
+    #author;
+    #pages;
+    isRead;
+    constructor(title, author, pages, isRead) {
+        super(title, author, pages, isRead);
     }
-}
 
-function addBookToLibrary(title, author, pages, isRead) {
-    const newbook = new Book(title, author, pages, isRead);
-    myLibrary.push(newbook);
-}
-
-function removeBookFromLibrary(card) {
-    myLibrary.splice(card.dataset.index, 1);
-}
-
-const displayBooks = (library) => {
-    const cardContainer = document.querySelector(".card-container");
-    cardContainer.replaceChildren()
-    library.forEach(book => {
+    initializeCard() {
+        const cardContainer = document.querySelector(".card-container");
+        cardContainer.replaceChildren();
         const card = document.createElement("div");
-        card.dataset.index = library.indexOf(book);
         // Add styling Class
         card.classList.add("card");
+        return card;
+    }
+
+    initializeContent(card) {
         // Set up info in the card
         const title = document.createElement("h3");
-        title.textContent = book.title;
+        title.textContent = this.#title;
         const author = document.createElement("p");
-        author.textContent = `written by ${book.author}`;
+        author.textContent = `written by ${this.#author}`;
         const pages = document.createElement("p");
-        pages.textContent = `${book.pages} pages`;
+        pages.textContent = `${this.#pages} pages`;
         const isRead = document.createElement("p");
         if (book.isRead) {
             isRead.textContent = "Read ✔";
         } else {
             isRead.textContent = "Not read ✘";
         }
-        //Set up button div
-        const btnContainer = document.createElement("div");
-        btnContainer.classList.add("btn-container");
-        // Set up read button
-        const toggleReadBtn = document.createElement("button");
-        toggleReadBtn.classList.add("toggle-read-btn");
-        
-        if (book.isRead) {
-            toggleReadBtn.textContent = "Unread";
-            toggleReadBtn.classList.add("unread");
-        } else {
-            toggleReadBtn.textContent = "Read";
-            toggleReadBtn.classList.add("read");
-        }
-        
-        toggleReadBtn.addEventListener("click", () => {
-            book.toggleReadStatus();
-            displayBooks(library);
-        })
-        // Set up remove button
-        const removeBtn = document.createElement("button");
-        removeBtn.textContent = "Remove";
-        removeBtn.classList.add("remove-btn");
-        removeBtn.addEventListener("click", () => {
-            removeBookFromLibrary(card);
-            displayBooks(library);
-        })
-
-        // Append buttons to btn container
-        btnContainer.append(toggleReadBtn);
-        btnContainer.append(removeBtn);
-
         // Append info
         card.append(title);
         card.append(author);
         card.append(pages);
         card.append(isRead);
         card.append(btnContainer);
-        
+    }
+
+    insertCard(card) {
         // Insert card
+        const cardContainer = document.querySelector(".card-container");
         cardContainer.append(card);
+    }
+
+}
+
+
+
+const displayBooks = (library) => {
+    
+    library.listBooks().forEach(book => {
+        const card = Card.initializeCard();
+        Card.initializeContent(card);
+        Card.insertCard(card);
+
+
+        
+        // card.dataset.index = library.indexOf(book);
+        
+        // //Set up button div
+        // const btnContainer = document.createElement("div");
+        // btnContainer.classList.add("btn-container");
+        // // Set up read button
+        // const toggleReadBtn = document.createElement("button");
+        // toggleReadBtn.classList.add("toggle-read-btn");
+        
+        // if (book.isRead) {
+        //     toggleReadBtn.textContent = "Unread";
+        //     toggleReadBtn.classList.add("unread");
+        // } else {
+        //     toggleReadBtn.textContent = "Read";
+        //     toggleReadBtn.classList.add("read");
+        // }
+        
+        // toggleReadBtn.addEventListener("click", () => {
+        //     book.toggleReadStatus();
+        //     displayBooks(library);
+        // })
+        // // Set up remove button
+        // const removeBtn = document.createElement("button");
+        // removeBtn.textContent = "Remove";
+        // removeBtn.classList.add("remove-btn");
+        // removeBtn.addEventListener("click", () => {
+        //     library.removeBook(book);
+        //     displayBooks(library);
+        // })
+
+        // // Append buttons to btn container
+        // btnContainer.append(toggleReadBtn);
+        // btnContainer.append(removeBtn);
+
+
+        
+
     })
 }
 
@@ -123,6 +163,6 @@ closeDialogBtn.addEventListener("click", () => {
     dialog.close();
 })
 
-addBookToLibrary("Elon Musk", "Walter Isaacson", 688, true);
-addBookToLibrary("Outliers: The Story of Success", "Malcolm Gladwell", 336, false);
+myLibrary.addBook(new Book("Elon Musk", "Walter Isaacson", 688, true));
+myLibrary.addBook(new Book("Outliers: The Story of Success", "Malcolm Gladwell", 336, false));
 displayBooks(myLibrary);

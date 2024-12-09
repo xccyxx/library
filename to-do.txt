@@ -1,0 +1,3 @@
+- refector Book function to Class
+- integrate toggleReadStatus to the Book Class
+- integrate addBookToLibrary to the Book Class
