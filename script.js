@@ -41,9 +41,10 @@ class Book {
 }
 
 class Card {
-    constructor(library, book) {
-        this.library = library;
+    constructor(book, onToggleReadStatus, onRemoveBook) {
         this.book = book;
+        this.onToggleReadStatus = onToggleReadStatus;
+        this.onRemoveBook = onRemoveBook;
         this.parent = document.querySelector(".card-container");
     }
 
@@ -81,7 +82,7 @@ class Card {
         this.card.append(isRead);
     }
 
-    addButtons(library) {
+    addButtons() {
         //Set up button div
         const btnContainer = document.createElement("div");
         btnContainer.classList.add("btn-container");
@@ -93,22 +94,22 @@ class Card {
         if (this.book.isRead) {
             toggleReadBtn.textContent = "Unread";
             toggleReadBtn.classList.add("unread");
+            toggleReadBtn.classList.remove("read");
         } else {
             toggleReadBtn.textContent = "Read";
             toggleReadBtn.classList.add("read");
+            toggleReadBtn.classList.remove("unread");
         }
         
         toggleReadBtn.addEventListener("click", () => {
-            this.book.toggleReadStatus();
-            displayBooks(this.library);
+            this.onToggleReadStatus();
         })
         // Set up remove button
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "Remove";
         removeBtn.classList.add("remove-btn");
         removeBtn.addEventListener("click", () => {
-            this.library.removeBook(this.book);
-            displayBooks(this.library);
+            this.onRemoveBook();
         })
 
         // Append buttons to btn container
@@ -133,7 +134,17 @@ const clearCardContainer = () => {
 const displayBooks = (library) => {
     clearCardContainer();
     library.listBooks().forEach(book => {
-        const card = new Card(library, book);
+        const onToggle = () => {
+            book.toggleReadStatus();
+            displayBooks(library);
+        }
+
+        const onRemove = () => {
+            library.removeBook(book);
+            displayBooks(library);
+        }
+
+        const card = new Card(book, onToggle, onRemove);
         card.render();
     })
 }
