@@ -27,55 +27,107 @@ class Book {
         this.isRead = isRead;
     }
 
+    getBook() {
+        return {
+            title: this.#title,
+            author: this.#author,
+            pages: this.#pages,
+            isRead: this.isRead
+        }
+    }
+
     toggleReadStatus() {
         this.isRead = !this.isRead;
     }
 }
 
 class Card {
-    #title;
-    #author;
-    #pages;
-    isRead;
-    constructor(title, author, pages, isRead) {
-        super(title, author, pages, isRead);
+    constructor(book) {
+        this.book = book;
+        this.parent = document.querySelector(".card-container");
     }
 
-    initializeCard() {
-        const cardContainer = document.querySelector(".card-container");
-        cardContainer.replaceChildren();
+    // cleanUpCardContainer(parent) {
+    //     this.parent.replaceChildren();
+    // }
+
+    createCard() {
         const card = document.createElement("div");
         // Add styling Class
         card.classList.add("card");
-        return card;
+        // initialize card element inside the Card class
+        this.card = card;
     }
 
-    initializeContent(card) {
-        // Set up info in the card
+    addContent() {
+        const bookContent = this.book.getBook();
+
         const title = document.createElement("h3");
-        title.textContent = this.#title;
+        title.textContent = bookContent.title;
+
         const author = document.createElement("p");
-        author.textContent = `written by ${this.#author}`;
+        author.textContent = `written by ${bookContent.author}`;
+
         const pages = document.createElement("p");
-        pages.textContent = `${this.#pages} pages`;
+        pages.textContent = `${bookContent.pages} pages`;
+
         const isRead = document.createElement("p");
-        if (book.isRead) {
+        if (bookContent.isRead) {
             isRead.textContent = "Read ✔";
         } else {
             isRead.textContent = "Not read ✘";
         }
+
         // Append info
-        card.append(title);
-        card.append(author);
-        card.append(pages);
-        card.append(isRead);
-        card.append(btnContainer);
+        this.card.append(title);
+        this.card.append(author);
+        this.card.append(pages);
+        this.card.append(isRead);
     }
 
-    insertCard(card) {
-        // Insert card
-        const cardContainer = document.querySelector(".card-container");
-        cardContainer.append(card);
+    addButtons() {
+        //Set up button div
+        const btnContainer = document.createElement("div");
+        btnContainer.classList.add("btn-container");
+        
+        // Set up read button
+        const toggleReadBtn = document.createElement("button");
+        toggleReadBtn.classList.add("toggle-read-btn");
+        
+        if (this.book.isRead) {
+            toggleReadBtn.textContent = "Unread";
+            toggleReadBtn.classList.add("unread");
+        } else {
+            toggleReadBtn.textContent = "Read";
+            toggleReadBtn.classList.add("read");
+        }
+        
+        toggleReadBtn.addEventListener("click", () => {
+            this.book.toggleReadStatus();
+            displayBooks(library);
+        })
+        // Set up remove button
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "Remove";
+        removeBtn.classList.add("remove-btn");
+        removeBtn.addEventListener("click", () => {
+            library.removeBook(book);
+            displayBooks(library);
+        })
+
+        // Append buttons to btn container
+        btnContainer.append(toggleReadBtn);
+        btnContainer.append(removeBtn);
+        this.card.append(btnContainer);
+    }
+
+    render() {
+        if (!this.card) {
+            this.createCard();
+            this.addContent();
+            this.addButtons();
+            this.parent.append(this.card);
+        }
     }
 
 }
@@ -85,9 +137,9 @@ class Card {
 const displayBooks = (library) => {
     
     library.listBooks().forEach(book => {
-        const card = Card.initializeCard();
-        Card.initializeContent(card);
-        Card.insertCard(card);
+        const card = new Card(book);
+        card.render();
+
 
 
         
@@ -124,6 +176,8 @@ const displayBooks = (library) => {
         // // Append buttons to btn container
         // btnContainer.append(toggleReadBtn);
         // btnContainer.append(removeBtn);
+        // card.append(btnContainer);
+
 
 
         
