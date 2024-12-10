@@ -6,8 +6,7 @@ class Library {
     }
 
     removeBook = (book) => {
-        // this.#library.splice(indexOf(book), 1);
-        console.log(book);
+        this.#library.splice(this.#library.indexOf(book), 1);
     }
 
     listBooks = () => [...this.#library];
@@ -42,14 +41,11 @@ class Book {
 }
 
 class Card {
-    constructor(book) {
+    constructor(library, book) {
+        this.library = library;
         this.book = book;
         this.parent = document.querySelector(".card-container");
     }
-
-    // cleanUpCardContainer(parent) {
-    //     this.parent.replaceChildren();
-    // }
 
     createCard() {
         const card = document.createElement("div");
@@ -85,7 +81,7 @@ class Card {
         this.card.append(isRead);
     }
 
-    addButtons() {
+    addButtons(library) {
         //Set up button div
         const btnContainer = document.createElement("div");
         btnContainer.classList.add("btn-container");
@@ -104,15 +100,15 @@ class Card {
         
         toggleReadBtn.addEventListener("click", () => {
             this.book.toggleReadStatus();
-            displayBooks(library);
+            displayBooks(this.library);
         })
         // Set up remove button
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "Remove";
         removeBtn.classList.add("remove-btn");
         removeBtn.addEventListener("click", () => {
-            library.removeBook(book);
-            displayBooks(library);
+            this.library.removeBook(this.book);
+            displayBooks(this.library);
         })
 
         // Append buttons to btn container
@@ -122,66 +118,23 @@ class Card {
     }
 
     render() {
-        if (!this.card) {
-            this.createCard();
-            this.addContent();
-            this.addButtons();
-            this.parent.append(this.card);
-        }
+        this.createCard();
+        this.addContent();
+        this.addButtons();
+        this.parent.append(this.card);
     }
-
 }
 
-
+const clearCardContainer = () => {
+    const cardContainer = document.querySelector(".card-container");
+    cardContainer.replaceChildren();
+}
 
 const displayBooks = (library) => {
-    
+    clearCardContainer();
     library.listBooks().forEach(book => {
-        const card = new Card(book);
+        const card = new Card(library, book);
         card.render();
-
-
-
-        
-        // card.dataset.index = library.indexOf(book);
-        
-        // //Set up button div
-        // const btnContainer = document.createElement("div");
-        // btnContainer.classList.add("btn-container");
-        // // Set up read button
-        // const toggleReadBtn = document.createElement("button");
-        // toggleReadBtn.classList.add("toggle-read-btn");
-        
-        // if (book.isRead) {
-        //     toggleReadBtn.textContent = "Unread";
-        //     toggleReadBtn.classList.add("unread");
-        // } else {
-        //     toggleReadBtn.textContent = "Read";
-        //     toggleReadBtn.classList.add("read");
-        // }
-        
-        // toggleReadBtn.addEventListener("click", () => {
-        //     book.toggleReadStatus();
-        //     displayBooks(library);
-        // })
-        // // Set up remove button
-        // const removeBtn = document.createElement("button");
-        // removeBtn.textContent = "Remove";
-        // removeBtn.classList.add("remove-btn");
-        // removeBtn.addEventListener("click", () => {
-        //     library.removeBook(book);
-        //     displayBooks(library);
-        // })
-
-        // // Append buttons to btn container
-        // btnContainer.append(toggleReadBtn);
-        // btnContainer.append(removeBtn);
-        // card.append(btnContainer);
-
-
-
-        
-
     })
 }
 
