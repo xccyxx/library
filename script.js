@@ -3,17 +3,14 @@ class Library {
 
     addBook = (book) => {
         this.#library.push(book);
-    }
+    };
 
     removeBook = (book) => {
         this.#library.splice(this.#library.indexOf(book), 1);
-    }
+    };
 
     listBooks = () => [...this.#library];
 }
-
-const myLibrary = new Library();
-
 class Book {
     #title;
     #author;
@@ -32,7 +29,7 @@ class Book {
             author: this.#author,
             pages: this.#pages,
             isRead: this.isRead
-        }
+        };
     }
 
     toggleReadStatus() {
@@ -91,26 +88,21 @@ class Card {
         const toggleReadBtn = document.createElement("button");
         toggleReadBtn.classList.add("toggle-read-btn");
         
-        if (this.book.isRead) {
-            toggleReadBtn.textContent = "Unread";
-            toggleReadBtn.classList.add("unread");
-            toggleReadBtn.classList.remove("read");
-        } else {
-            toggleReadBtn.textContent = "Read";
-            toggleReadBtn.classList.add("read");
-            toggleReadBtn.classList.remove("unread");
-        }
+        toggleReadBtn.textContent = this.book.isRead ? "Unread" : "Read";
+        toggleReadBtn.classList.toggle("read", !this.book.isRead);
+        toggleReadBtn.classList.toggle("unread", this.book.isRead);
         
         toggleReadBtn.addEventListener("click", () => {
             this.onToggleReadStatus();
-        })
+        });
+        
         // Set up remove button
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "Remove";
         removeBtn.classList.add("remove-btn");
         removeBtn.addEventListener("click", () => {
             this.onRemoveBook();
-        })
+        });
 
         // Append buttons to btn container
         btnContainer.append(toggleReadBtn);
@@ -137,62 +129,54 @@ const displayBooks = (library) => {
         const onToggle = () => {
             book.toggleReadStatus();
             displayBooks(library);
-        }
+        };
 
         const onRemove = () => {
             library.removeBook(book);
             displayBooks(library);
-        }
+        };
 
         const card = new Card(book, onToggle, onRemove);
         card.render();
-    })
+    });
 }
 
 // Add new book button
-const setupAddBookBtn = () => {
-    const dialog = document.querySelector(".add-book-dialog");
-
+const setupAddBookBtn = (dialog) => {
     const addBookBtn = document.querySelector(".add-book-btn");
     addBookBtn.addEventListener("click", () => {
         dialog.showModal();
-    })
+    });
 }
 
-const handleForm = () => {
+const handleForm = (library, dialog) => {
     // Prevent the behaviour of the submission
-const form = document.querySelector(".form-section");
-form.addEventListener("submit", (event) => {
-    // Prevent the form to be submitted to backend
-    event.preventDefault();
+    const form = document.querySelector(".form-section");
+    form.addEventListener("submit", (event) => {
+        // Prevent the form to be submitted to backend
+        event.preventDefault();
 
-    // Create a FormData object from the form
-    const formData = new FormData(form);
+        // Create a FormData object from the form
+        const formData = new FormData(form);
 
-    // Convert FormData to a plain object
-    const data = Object.fromEntries(formData.entries());
+        // Convert FormData to a plain object
+        const data = Object.fromEntries(formData.entries());
 
-    // Destructure the form data
-    const { title, author, pages, isRead } = data;
+        // Destructure the form data
+        let { title, author, pages, isRead } = data;
 
-    // Log the values
-    console.log(title, author, pages, isRead);
-    
-    // // Extract the form data
-    // title = form.elements["title"].value
-    // author = form.elements["author"].value
-    // pages = form.elements["pages"].value
-    // isRead = form.elements["isRead"].checked
+        // modify isRead
+        isRead = isRead === "on";   
 
-    // Add the new book to the arrar and display it
-    addBookToLibrary(title, author, pages, isRead);
-    displayBooks(myLibrary);
-    form.reset();
-    dialog.close();
-})
-}
+        // Add book to library
+        library.addBook(new Book(title, author, pages, isRead));
+        displayBooks(library);
+        form.reset();
+        dialog.close();
+        });
+    }
 
-const setupCloseDialogBtn = () => {
+const setupCloseDialogBtn = (dialog) => {
     // Close dialog button
     const closeDialogBtn = document.querySelector(".close-dialog-btn");
     closeDialogBtn.addEventListener("click", () => {
@@ -200,10 +184,19 @@ const setupCloseDialogBtn = () => {
     })
 }
 
-setupAddBookBtn();
-handleForm();
+const setupAddBookFeature = (library) => {
+    const dialog = document.querySelector(".add-book-dialog");
+    setupAddBookBtn(dialog);
+    handleForm(library, dialog);
+    setupCloseDialogBtn(dialog);
+}
 
+const init = () => {
+    const myLibrary = new Library();
+    setupAddBookFeature(myLibrary);
+    myLibrary.addBook(new Book("Elon Musk", "Walter Isaacson", 688, true));
+    myLibrary.addBook(new Book("Outliers: The Story of Success", "Malcolm Gladwell", 336, false));
+    displayBooks(myLibrary);
+}
 
-myLibrary.addBook(new Book("Elon Musk", "Walter Isaacson", 688, true));
-myLibrary.addBook(new Book("Outliers: The Story of Success", "Malcolm Gladwell", 336, false));
-displayBooks(myLibrary);
+init();
